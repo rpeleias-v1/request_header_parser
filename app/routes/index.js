@@ -1,18 +1,41 @@
 module.exports = function(app) {
-	
 
+	var RequestParser = app.models.requestParser;
+
+	/**
+	 * @api {get} / API index
+	 * @apiGroup Request Header Parser
+	 * @apiSuccess {String} status: API status message
+	 * @apiSuccessExample {json} Success
+	 *  HTTP/1.1 200 OK
+	 * {"status": "Request Header Parser API"}
+	 */
 	app.route("/")
 	  .get(function(req, res) {
-	  	res.json({status: 'Request Header PArser API'});
+	  	res.json({status: 'Request Header Parser API'});
 	  });
 
+	/**
+	 * @api {get} /api/whoami Request Header Parser Information
+	 * @apiGroup Request Header Parser	 
+	 * @apiSuccess {String} ipaddress Browser client Ip Address
+	 * @apiSuccess {String} language Browser client primary language
+	 * @apiSuccess {String} software Browser client operating system
+	 * @apiSuccessExample {json} Success
+	 *  HTTP/1.1 200 OK
+	 *  {
+	 *	  "ipaddress": "127.0.0.1",
+	 *	  "language": "pt",
+	 *	  "software": "X11; Linux x86_64"
+	 *  } 
+	 */
 	app.route("/api/whoami")
-	  .get(function(req, res) {	  	
-	  	console.log(req.headers);	  	
+	  .get(function(req, res) {	
+	  	var requestWrapper = new RequestParser(req);	  	
 	  	res.json({
-	  		ipaddress: req.connection.remoteAddress.split(':')[3],
-	  		language: req.headers['accept-language'].split(',')[0],
-	  		software: req.headers['user-agent']
+	  		ipaddress: requestWrapper.getIpAddress(),
+	  		language: requestWrapper.getLanguage(),
+	  		software: requestWrapper.getOperatingSystem()
 	  	});
 	  });	
 }
